@@ -14,7 +14,6 @@ public class Drzava {
     public Drzava() {
 
     }
-
     public int getId() {
         return id;
     }
@@ -38,5 +37,10 @@ public class Drzava {
 
     public void setGlavniGrad(Grad glavniGrad) {
         this.glavniGrad = glavniGrad;
+    }
+
+    @Override
+    public String toString() {
+        return getNaziv();
     }
 }

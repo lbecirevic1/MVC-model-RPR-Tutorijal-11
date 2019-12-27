@@ -1,10 +1,12 @@
 package ba.unsa.etf.rpr;
 
+import java.util.ArrayList;
+
 public class Grad {
-    int id;
-    String naziv;
-    int brojStanovnika;
-    Drzava drzava;
+    private int id;
+    private String naziv;
+    private int brojStanovnika;
+    private Drzava drzava;
 
     public Grad () {
 
@@ -33,19 +35,24 @@ public class Grad {
         this.naziv = naziv;
     }
 
+    public int getBrojStanovnika() {
+        return brojStanovnika;
+    }
+
     public void setBrojStanovnika(int brojStanovnika) {
         this.brojStanovnika = brojStanovnika;
     }
 
-    public int getBrojStanovnika() {
-        return brojStanovnika;
+    public Drzava getDrzava() {
+        return drzava;
     }
 
     public void setDrzava(Drzava drzava) {
         this.drzava = drzava;
     }
 
-    public Grad getDrzava() {
-        return null;
+    @Override
+    public String toString() {
+        return getNaziv();
     }
 }
