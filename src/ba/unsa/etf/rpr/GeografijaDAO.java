@@ -81,7 +81,7 @@ public class GeografijaDAO {
             ResultSet result = dajGradoveStatement.executeQuery();  //sadrzi tabelu gradovi (drzava - id drzave)
             while(result.next()) {
                  Grad grad = new Grad(result.getInt("id"), result.getString("naziv"), result.getInt("broj_stanovnika"), null);
-                 dajDrzavuStatement.setInt(1, result.getInt("id"));
+                 dajDrzavuStatement.setInt(1, result.getInt("drzava"));
                   ResultSet resultSet = dajDrzavuStatement.executeQuery(); //sadrzi drzavu sa poslanim id-em iz prethodne linije
                 if (resultSet.next()) { //da postavi na prvi red
                     Drzava drzava = new Drzava(resultSet.getInt("id"), resultSet.getString("naziv"), grad);
