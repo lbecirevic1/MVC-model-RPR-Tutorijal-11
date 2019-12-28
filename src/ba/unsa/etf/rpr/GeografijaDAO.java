@@ -10,48 +10,23 @@ import java.util.Scanner;
 public class GeografijaDAO {
     private static GeografijaDAO instance;
 
-    private static Connection conn;
-    private static PreparedStatement dajGradoveStatement, dodajGrad, dodajDrzavu, dajDrzavuStatement, dajGlavniGradStatement, dajGradStatement;
-    private static PreparedStatement obrisiDrzavuStatement, dajIdDrzaveStatement, obrisiGradStatement, obrisi, obrisiD, dajDrzavuPoNazivu, updateGrad;
+    private static Connection conn = null;
+    private static PreparedStatement dajGradoveStatement, dodajGrad, dodajDrzavu;
+    private static PreparedStatement dajDrzavuStatement, dajGlavniGradStatement, dajGradStatement;
+    private static PreparedStatement obrisiDrzavuStatement, dajIdDrzaveStatement, obrisiGradStatement, dajDrzavuPoNazivu, updateGrad;
+
     private GeografijaDAO (){
         //konstruktor kreira konekcije i sve pripremljene upite
         try {
             conn = DriverManager.getConnection("jdbc:sqlite:baza.db");
+            upiti();
         } catch(SQLException e) {
             e.printStackTrace();
-        }
-        try {
-            dajGradoveStatement = conn.prepareStatement("SELECT * FROM grad order by broj_stanovnika desc");
-            dajDrzavuStatement = conn.prepareStatement("SELECT * FROM drzava where id=?");
-            dodajGrad = conn.prepareStatement("INSERT INTO grad VALUES (?,?,?,?)");
-            dodajDrzavu = conn.prepareStatement("insert into drzava values (?,?,?)");
-            dajGlavniGradStatement = conn.prepareStatement("SELECT glavni_grad FROM drzava where naziv=?");
-            dajGradStatement = conn.prepareStatement("SELECT * FROM grad WHERE id=?");
-            dajIdDrzaveStatement = conn.prepareStatement("SELECT id from drzava where naziv=?");
-            obrisiDrzavuStatement = conn.prepareStatement("DELETE FROM drzava where naziv=?");
-            obrisiGradStatement = conn.prepareStatement("DELETE from grad where drzava=?");
-//            obrisi = conn.prepareStatement("DELETE from drzava");
-//            obrisiD = conn.prepareStatement("DELETE from grad");
-            dajDrzavuPoNazivu = conn.prepareStatement("SELECT * FROM drzava where naziv=?");
-            updateGrad = conn.prepareStatement("UPDATE grad SET naziv=?,broj_stanovnika=?,drzava=? WHERE id=?");
-        } catch (SQLException ex) {
-            generisiBazu();
             try {
-                dajGradoveStatement = conn.prepareStatement("SELECT * FROM grad order by broj_stanovnika desc");
-                dajDrzavuStatement = conn.prepareStatement("SELECT * FROM drzava where id=?");
-                dodajGrad = conn.prepareStatement("INSERT INTO grad VALUES (?,?,?,?)");
-                dodajDrzavu = conn.prepareStatement("insert into drzava values (?,?,?)");
-                dajGlavniGradStatement = conn.prepareStatement("SELECT glavni_grad FROM drzava where naziv=?");
-                dajGradStatement = conn.prepareStatement("SELECT * FROM grad WHERE id=?");
-                dajIdDrzaveStatement = conn.prepareStatement("SELECT id from drzava where naziv=?");
-                obrisiDrzavuStatement = conn.prepareStatement("DELETE FROM drzava where naziv=?");
-                obrisiGradStatement = conn.prepareStatement("DELETE from grad where drzava=?");
-                updateGrad = conn.prepareStatement("UPDATE grad SET naziv=?,broj_stanovnika=?,drzava=? WHERE id=?");
-//                obrisi = conn.prepareStatement("DELETE from drzava");
-//                obrisiD = conn.prepareStatement("DELETE from grad");
-                dajDrzavuPoNazivu = conn.prepareStatement("SELECT * FROM drzava where naziv=?");
-            } catch (SQLException el) {
-                el.printStackTrace();
+                generisiBazu();
+                upiti();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
             }
         }
     }
@@ -59,7 +34,7 @@ public class GeografijaDAO {
     private void generisiBazu() {
         Scanner ulaz = null;
         try {
-            ulaz = new Scanner(new FileInputStream("baza.sql"));
+            ulaz = new Scanner(new FileInputStream("baza.db.sql"));
             String sqlUpit = "";
             while (ulaz.hasNext()) {
                 sqlUpit += ulaz.nextLine();
@@ -79,9 +54,11 @@ public class GeografijaDAO {
             System.out.println("Ne postoji SQL datoteka... nastavljam sa praznom bazom");
         }
     }
+
     public static GeografijaDAO getInstance() {
-        if (instance == null)
+        if (instance == null) {
             instance = new GeografijaDAO();
+        }
         return instance;
     }
 
@@ -115,7 +92,6 @@ public class GeografijaDAO {
                     lista.add(grad);
                 }
                 resultSet.close();
-
             }
             result.close();
         } catch (SQLException e) {
@@ -144,7 +120,6 @@ public class GeografijaDAO {
                     }
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -162,7 +137,8 @@ public class GeografijaDAO {
                 obrisiGradStatement.setInt(1, result1.getInt(1));
                 obrisiGradStatement.executeUpdate();
             }
-
+            obrisiDrzavuStatement.setString(1, naziv);
+            obrisiDrzavuStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -226,14 +202,22 @@ public class GeografijaDAO {
         }
     }
 
-    public void izbrisi () {
-        try {
-            obrisi.executeUpdate();
-            obrisiD.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+
+    private void upiti () throws SQLException {
+        dajGradoveStatement = conn.prepareStatement("SELECT * FROM grad order by broj_stanovnika desc");
+        dajDrzavuStatement = conn.prepareStatement("SELECT * FROM drzava where id=?");
+        dodajGrad = conn.prepareStatement("INSERT INTO grad VALUES (?,?,?,?)");
+        dodajDrzavu = conn.prepareStatement("insert into drzava values (?,?,?)");
+        dajGlavniGradStatement = conn.prepareStatement("SELECT glavni_grad FROM drzava where naziv=?");
+        dajGradStatement = conn.prepareStatement("SELECT * FROM grad WHERE id=?");
+        dajIdDrzaveStatement = conn.prepareStatement("SELECT id from drzava where naziv=?");
+        obrisiDrzavuStatement = conn.prepareStatement("DELETE FROM drzava where naziv=?");
+        obrisiGradStatement = conn.prepareStatement("DELETE from grad where drzava=?");
+        updateGrad = conn.prepareStatement("UPDATE grad SET naziv=?,broj_stanovnika=?,drzava=? WHERE id=?");
+        dajDrzavuPoNazivu = conn.prepareStatement("SELECT * FROM drzava where naziv=?");
     }
+
+
 }
 
 //da bismo pristupili bazi trebaju driveri
