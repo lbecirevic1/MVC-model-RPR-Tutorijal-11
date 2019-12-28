@@ -14,7 +14,7 @@ public class GeografijaDAO {
     private static PreparedStatement dajGradoveStatement, dodajGrad, dodajDrzavu;
     private static PreparedStatement dajDrzavuStatement, dajGlavniGradStatement, dajGradStatement;
     private static PreparedStatement obrisiDrzavuStatement, dajIdDrzaveStatement, obrisiGradStatement, dajDrzavuPoNazivu, updateGrad;
-
+    private static PreparedStatement uzmiMaxIdDrzave, uzmiMaxIdGrada;
     private GeografijaDAO (){
         //konstruktor kreira konekcije i sve pripremljene upite
         try {
@@ -166,11 +166,17 @@ public class GeografijaDAO {
     }
 
     public void dodajGrad(Grad grad) {
+        int id = 0;
         try {
-            dodajGrad.setInt(1, grad.getId());
+            ResultSet result1 = uzmiMaxIdGrada.executeQuery();
+            if (result1.next()) {
+                id = result1.getInt(1);
+            }
+            grad.setId(id);
+            dodajGrad.setInt(1, id);
             dodajGrad.setString(2, grad.getNaziv());
             dodajGrad.setInt(3,grad.getBrojStanovnika());
-            dodajGrad.setObject(4, grad.getDrzava());
+            dodajGrad.setInt(4, grad.getDrzava().getId());
             dodajGrad.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -179,10 +185,16 @@ public class GeografijaDAO {
     }
 
     public void dodajDrzavu(Drzava drzava) {
+        int id = 0;
         try {
-            dodajDrzavu.setInt(1, drzava.getId());
+            ResultSet result1 = uzmiMaxIdDrzave.executeQuery();
+            if (result1.next()) {
+                id = result1.getInt(1);
+            }
+            drzava.setId(id);
+            dodajDrzavu.setInt(1, id);
             dodajDrzavu.setString(2,drzava.getNaziv());
-            dodajDrzavu.setObject(3, drzava.getGlavniGrad());
+            dodajDrzavu.setInt(3, drzava.getGlavniGrad().getId());
             dodajDrzavu.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -215,6 +227,9 @@ public class GeografijaDAO {
         obrisiGradStatement = conn.prepareStatement("DELETE from grad where drzava=?");
         updateGrad = conn.prepareStatement("UPDATE grad SET naziv=?,broj_stanovnika=?,drzava=? WHERE id=?");
         dajDrzavuPoNazivu = conn.prepareStatement("SELECT * FROM drzava where naziv=?");
+        uzmiMaxIdGrada = conn.prepareStatement("SELECT max(id)+1 FROM grad");
+        uzmiMaxIdDrzave = conn.prepareStatement("SELECT max(id)+1 FROM drzava");
+
     }
 
 

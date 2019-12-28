@@ -9,6 +9,7 @@ public class Main {
        String url = "jdbc:sqlite:baza.db";
         System.out.println("Gradovi su:\n" + ispisiGradove());
         glavniGrad();
+        System.out.println("Id-ovi drzave su: ");
     }
 
     private static void glavniGrad() {
@@ -24,6 +25,7 @@ public class Main {
 //            Glavni grad države Država je Grad
             System.out.println("Glavni grad drzave " + s + " je " + grad.getNaziv());
         }
+        dao.removeInstance();
         
     }
 
@@ -35,6 +37,7 @@ public class Main {
         for (int i = 0; i < gradovi.size(); i = i + 1) {
             ispis = ispis + gradovi.get(i).getNaziv() + " (" + gradovi.get(i).getDrzava() + ") - " + gradovi.get(i).getBrojStanovnika() + "\n";
         }
+        dao.removeInstance();
         return ispis;
     }
 
