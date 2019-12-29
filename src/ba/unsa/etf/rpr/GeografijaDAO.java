@@ -2,12 +2,15 @@ package ba.unsa.etf.rpr;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
+//Ovo je sada model klasa
 public class GeografijaDAO {
+
+//    private ObservableList<Drzava> drzave = FXCollections.observableArrayList();
+//    private SimpleObjectProperty<Drzava> trenutnaDrzava = new SimpleObjectProperty<>();
     private static GeografijaDAO instance;
 
     private static Connection conn = null;
@@ -15,6 +18,8 @@ public class GeografijaDAO {
     private static PreparedStatement dajDrzavuStatement, dajGlavniGradStatement, dajGradStatement;
     private static PreparedStatement obrisiDrzavuStatement, dajIdDrzaveStatement, obrisiGradStatement, dajDrzavuPoNazivu, updateGrad;
     private static PreparedStatement uzmiMaxIdDrzave, uzmiMaxIdGrada;
+
+
     private GeografijaDAO (){
         //konstruktor kreira konekcije i sve pripremljene upite
         try {
@@ -29,6 +34,10 @@ public class GeografijaDAO {
                 ex.printStackTrace();
             }
         }
+    }
+
+    private static void initialize () {
+        instance = new GeografijaDAO();
     }
 
     private void generisiBazu() {
@@ -80,15 +89,15 @@ public class GeografijaDAO {
         try {
             ResultSet result = dajGradoveStatement.executeQuery();  //sadrzi tabelu gradovi (drzava - id drzave)
             while(result.next()) {
-                 Grad grad = new Grad(result.getInt("id"), result.getString("naziv"), result.getInt("broj_stanovnika"), null);
-                 dajDrzavuStatement.setInt(1, result.getInt("drzava"));
-                  ResultSet resultSet = dajDrzavuStatement.executeQuery(); //sadrzi drzavu sa poslanim id-em iz prethodne linije
+                Grad grad = new Grad(result.getInt("id"), result.getString("naziv"), result.getInt("broj_stanovnika"), null);
+                dajDrzavuStatement.setInt(1, result.getInt("drzava"));
+                ResultSet resultSet = dajDrzavuStatement.executeQuery(); //sadrzi drzavu sa poslanim id-em iz prethodne linije
                 if (resultSet.next()) { //da postavi na prvi red
                     Drzava drzava = new Drzava(resultSet.getInt("id"), resultSet.getString("naziv"), grad);
                     grad.setDrzava(drzava);
                     lista.add(grad);
                 } else {
-                   // grad.setDrzava(null);
+                    // grad.setDrzava(null);
                     lista.add(grad);
                 }
                 resultSet.close();
@@ -233,6 +242,13 @@ public class GeografijaDAO {
     }
 
 
+    public Object drzave() {
+        return null;
+    }
+
+    public Grad nadjiGrad(String graz) {
+        return null;
+    }
 }
 
 //da bismo pristupili bazi trebaju driveri
