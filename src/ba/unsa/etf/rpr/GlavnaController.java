@@ -1,12 +1,16 @@
 package ba.unsa.etf.rpr;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -20,11 +24,11 @@ public class GlavnaController {
     GradController gradController;
     DrzavaController drzavaController;
 
-    public TableView tableViewGradovi;
-    public TableColumn colGradId;
-    public TableColumn colGradNaziv;
-    public TableColumn colGradStanovnika;
-    public TableColumn colGradDrzava;
+    public TableView <Grad> tableViewGradovi;
+    public TableColumn<Grad, Integer> colGradId;
+    public TableColumn<Grad, String> colGradNaziv;
+    public TableColumn<Grad, Integer> colGradStanovnika;
+    public TableColumn<Grad, Integer> colGradDrzava;
     public Button btnDodajGrad;
     public Button btnDodajDrzavu;
     public Button btnIzmijeniGrad;
@@ -34,6 +38,16 @@ public class GlavnaController {
         dao = d;
     }
 
+    @FXML
+    public void initialize () {
+        ObservableList<Grad> listaGradova = FXCollections.observableArrayList(dao.gradovi());
+        tableViewGradovi.setItems(listaGradova);
+        colGradId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colGradNaziv.setCellValueFactory(new PropertyValueFactory<>("naziv"));
+        colGradStanovnika.setCellValueFactory(new PropertyValueFactory<>("brojStanovnika"));
+        colGradDrzava.setCellValueFactory(new PropertyValueFactory<>("drzava"));
+        tableViewGradovi.getColumns().setAll(colGradId, colGradNaziv, colGradStanovnika, colGradDrzava);
+    }
 
     public void resetujBazu() {
         GeografijaDAO.removeInstance();
