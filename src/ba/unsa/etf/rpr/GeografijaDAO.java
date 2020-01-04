@@ -165,6 +165,8 @@ public class GeografijaDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        listaGradova.clear();
+        listaGradova.addAll(gradovi());
     }
     public Drzava nadjiDrzavu(String naziv) {
         try {
@@ -304,6 +306,22 @@ public class GeografijaDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public ObservableList<Grad> getListaGradova() {
+        return listaGradova;
+    }
+
+    public void setListaGradova(ObservableList<Grad> listaGradova) {
+        this.listaGradova = listaGradova;
+    }
+
+    public ObservableList<Drzava> getListaDrzava() {
+        return listaDrzava;
+    }
+
+    public void setListaDrzava(ObservableList<Drzava> listaDrzava) {
+        this.listaDrzava = listaDrzava;
     }
 }
 

@@ -39,6 +39,7 @@ public class GlavnaController {
     public Button btnDodajDrzavu;
     public Button btnIzmijeniGrad;
     public Button btnObrisiGrad;
+    private ObservableList<Grad> listaZaTabelu;
 
     public GlavnaController (GeografijaDAO d) {
         dao = d;
@@ -46,13 +47,14 @@ public class GlavnaController {
 
     public GlavnaController() {
         dao = GeografijaDAO.getInstance();
+        listaZaTabelu = dao.getListaGradova();
     }
 
 
     @FXML
     public void initialize () {
-        ObservableList<Grad> listaGradova = FXCollections.observableArrayList(dao.gradovi());
-        tableViewGradovi.setItems(listaGradova);
+     //   ObservableList<Grad> listaGradova = FXCollections.observableArrayList(dao.gradovi());
+        tableViewGradovi.setItems(listaZaTabelu);
         colGradId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colGradNaziv.setCellValueFactory(new PropertyValueFactory<>("naziv"));
         colGradStanovnika.setCellValueFactory(new PropertyValueFactory<>("brojStanovnika"));
@@ -102,6 +104,7 @@ public class GlavnaController {
         myStage.setOnHiding(event -> Platform.runLater(() -> {
             if (gradController.getGrad() != null)
                 dao.dodajGrad(gradController.getGrad());
+            listaZaTabelu.setAll(dao.getListaGradova());
         }));
 
     }
@@ -127,6 +130,7 @@ public class GlavnaController {
         myStage.setOnHiding(event -> Platform.runLater(() -> {
             if (gradController.getGrad() != null)
                 dao.izmijeniGrad(gradController.getGrad());
+            listaZaTabelu.setAll(dao.getListaGradova());
         }));
     }
 
@@ -143,5 +147,7 @@ public class GlavnaController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK)
             dao.obrisiGrad(trenutniGrad);
+        listaZaTabelu.setAll(dao.getListaGradova());
     }
+
 }
