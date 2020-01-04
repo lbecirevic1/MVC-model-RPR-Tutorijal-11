@@ -9,9 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -21,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -35,7 +34,7 @@ public class GlavnaController {
     public TableColumn<Grad, Integer> colGradId;
     public TableColumn<Grad, String> colGradNaziv;
     public TableColumn<Grad, Integer> colGradStanovnika;
-    public TableColumn<Grad, Integer> colGradDrzava;
+    public TableColumn<Grad, String> colGradDrzava;
     public Button btnDodajGrad;
     public Button btnDodajDrzavu;
     public Button btnIzmijeniGrad;
@@ -46,7 +45,7 @@ public class GlavnaController {
     }
 
     public GlavnaController() {
-
+        dao = GeografijaDAO.getInstance();
     }
 
 
@@ -80,24 +79,15 @@ public class GlavnaController {
 
         myStage.setScene(new Scene(root, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE));
         myStage.show();
-        //myStage.setOnHiding(event -> dao.dodajDrzavu(drzavaController.getDrzava()));
 
-//               myStage.setOnHiding(new EventHandler<WindowEvent>() {
-//            @Override
-//            public void handle(WindowEvent event) {
-//                Platform.runLater(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        System.out.println("Application Closed by click to Close Button(X)");
-//                        if (drzavaController.getDrzava() != null) {
-//                            dao.dodajDrzavu(drzavaController.getDrzava());
-//                        }
-//                        System.exit(0);
-//                    }
-//                });
-//            }
-//        });
+        myStage.setOnHiding(event -> dao.dodajDrzavu(drzavaController.getDrzava()));
+        //Dio koda zamijenjen labmda funkcijom
+            myStage.setOnHiding(event -> Platform.runLater(() -> {
+                if (drzavaController.getDrzava() != null)
+                    dao.dodajDrzavu(drzavaController.getDrzava());
+            }));
     }
+
     public void dodajGrad (ActionEvent actionEvent) throws IOException, SQLException {
         Parent root = null;
         Stage myStage = new Stage();
@@ -109,31 +99,23 @@ public class GlavnaController {
 
         myStage.setScene(new Scene(root, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE));
         myStage.show();
-       // if (gradController.getGrad().getNaziv() != null && gradController.getGrad().getBrojStanovnika() != 0 && gradController.getGrad().getDrzava() != null) {
-            if (gradController.getGrad() != null) {
-                myStage.setOnHiding(new EventHandler<WindowEvent>() {
-                    @Override
-                    public void handle(WindowEvent event) {
-                        Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                System.out.println("Application Closed by click to Ok Button");
-//                            if (gradController.getGrad().getNaziv() != null && gradController.getGrad().getBrojStanovnika() != 0 && gradController.getGrad().getDrzava() != null) {
-                                dao.dodajGrad(gradController.getGrad());
-                                //}
-                                System.exit(0);
-                            }
-                        });
-                    }
-                });
-            }
+        myStage.setOnHiding(event -> Platform.runLater(() -> {
+            if (gradController.getGrad() != null)
+                dao.dodajGrad(gradController.getGrad());
+        }));
+
     }
 
     public void promijeniGrad (ActionEvent actionEvent) throws IOException {
+
+        Grad trenutniGrad = tableViewGradovi.getSelectionModel().getSelectedItem();
+        if (trenutniGrad == null)
+            return;
+
         Parent root = null;
         Stage myStage = new Stage();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/grad.fxml"));
-        loader.setController(new GradController(dao.getTrenutniGrad(), dao.drzave())); //staviti grad koji se edituje umjesto null
+        loader.setController(new GradController(trenutniGrad, dao.drzave())); //staviti grad koji se edituje umjesto null
         gradController = loader.getController();
         root = loader.load();
         myStage.setTitle("Gradovi");
@@ -141,54 +123,25 @@ public class GlavnaController {
 
         myStage.setScene(new Scene(root, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE));
         myStage.show();
-        if (gradController.getGrad() != null) {
-            myStage.setOnHiding(new EventHandler<WindowEvent>() {
-                @Override
-                public void handle(WindowEvent event) {
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            System.out.println("Application Closed by click to Close Button(X)");
-                            if (gradController.getGrad() != null) {
-                                dao.izmijeniGrad(gradController.getGrad());
-                            }
-                            Platform.exit();
-                            System.exit(0);
-                        }
-                    });
-                }
-            });
-        }
+//        //Dio koda koji je zamjenjen lambda funkcijom:
+        myStage.setOnHiding(event -> Platform.runLater(() -> {
+            if (gradController.getGrad() != null)
+                dao.izmijeniGrad(gradController.getGrad());
+        }));
     }
 
     public void obrisiGrad (ActionEvent actionEvent) throws IOException {
-        Parent root = null;
-        Stage myStage = new Stage();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/grad.fxml"));
-        loader.setController(new GradController(null, dao.drzave()));
-        gradController = loader.getController();
-        root = loader.load();
-        myStage.setTitle("Gradovi");
+        Grad trenutniGrad = tableViewGradovi.getSelectionModel().getSelectedItem();
 
-        myStage.setScene(new Scene(root, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE));
-        myStage.show();
+        if (trenutniGrad == null)
+            return;
 
-//        myStage.setOnHiding(new EventHandler<WindowEvent>() {
-//            @Override
-//            public void handle(WindowEvent event) {
-//                Platform.runLater(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        System.out.println("Application Closed by click to Close Button(X)");
-//                        if (gradController.getGrad() != null) {
-//                            dao.izmijeniGrad(gradController.getGrad());
-//                        }
-//                        Platform.exit();
-//                        System.exit(0);
-//                    }
-//                });
-//            }
-//        });
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm deletion");
+        alert.setContentText("Are you sure you want to delete: " + trenutniGrad.getNaziv() + "?");
 
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK)
+            dao.obrisiGrad(trenutniGrad);
     }
 }

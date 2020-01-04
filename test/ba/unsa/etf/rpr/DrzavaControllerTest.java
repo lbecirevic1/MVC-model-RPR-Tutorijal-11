@@ -60,6 +60,6 @@ class DrzavaControllerTest {
         robot.clickOn("#btnOk");
 
         // Sada je naziv validan, forma se zatvorila
-//        assertFalse(theStage.isShowing());
+        assertFalse(theStage.isShowing());
     }
 }

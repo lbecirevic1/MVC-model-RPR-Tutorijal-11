@@ -26,10 +26,11 @@ public class GradController {
     public Button btnCancel;
     private ArrayList<Drzava> listaDrzava;
     private Grad editujGrad;
-    private Grad trenutniGrad = null;
+  //  private Grad trenutniGrad = null;
 
     //btnCancel
     public void zatvoriProzor(ActionEvent actionEvent) {
+        editujGrad = null;
         Node n = (Node) actionEvent.getSource();
         Stage stage = (Stage) n.getScene().getWindow();
         stage.close();
@@ -38,7 +39,6 @@ public class GradController {
     public GradController(Grad editujGrad, ArrayList<Drzava> listaDrzava) {
         this.listaDrzava = listaDrzava;
         this.editujGrad = editujGrad;
-     //   trenutniGrad = new Grad();
     }
 
     @FXML
@@ -48,7 +48,11 @@ public class GradController {
         if (editujGrad != null) {
             fieldNaziv.setText(editujGrad.getNaziv());
             fieldBrojStanovnika.setText(String.valueOf(editujGrad.getBrojStanovnika()));
-         //   choiceDrzava.setValue(editujGrad.getDrzava());
+            for (Drzava drzava : listaDrzava)
+                if (drzava.getId() == editujGrad.getDrzava().getId())
+                    choiceDrzava.getSelectionModel().select(drzava);
+        } else {
+            choiceDrzava.getSelectionModel().selectFirst();
         }
 
     }
@@ -57,6 +61,8 @@ public class GradController {
     public void validiraj(ActionEvent actionEvent) {
         boolean jesteInt = true;
         boolean nijePrazno = true;
+        boolean ispravnoPoljeNaziv = false;
+        boolean ispravnoPoljeStanovnici = false;
          try {
                 Integer.parseInt(fieldBrojStanovnika.getText());
             } catch(NumberFormatException e) {
@@ -67,6 +73,7 @@ public class GradController {
         if(jesteInt && nijePrazno && Integer.parseInt(fieldBrojStanovnika.getText()) > 0) {
             fieldBrojStanovnika.getStyleClass().removeAll("nijeIspravno");
             fieldBrojStanovnika.getStyleClass().add("ispravno");
+            ispravnoPoljeStanovnici = true;
         } else {
             fieldBrojStanovnika.getStyleClass().removeAll("ispravno");
             fieldBrojStanovnika.getStyleClass().add("nijeIspravno");
@@ -74,25 +81,29 @@ public class GradController {
         if (!fieldNaziv.getText().trim().equals("")) {
             fieldNaziv.getStyleClass().removeAll("nijeIspravno");
             fieldNaziv.getStyleClass().add("ispravno");
+            ispravnoPoljeNaziv = true;
         } else {
             fieldNaziv.getStyleClass().removeAll("ispravno");
             fieldNaziv.getStyleClass().add("nijeIspravno");
         }
-        if (!fieldNaziv.getText().trim().equals("") && !fieldBrojStanovnika.getText().trim().equals("") && !choiceDrzava.getSelectionModel().isEmpty()) {
-            trenutniGrad = new Grad();
-            trenutniGrad.setNaziv(fieldNaziv.getText());
-            trenutniGrad.setBrojStanovnika(Integer.parseInt(fieldBrojStanovnika.getText()));
-            trenutniGrad.setDrzava(choiceDrzava.getSelectionModel().getSelectedItem());
+        if (!ispravnoPoljeNaziv || !ispravnoPoljeStanovnici)
+            return;
+
+        if (editujGrad == null) {
+            editujGrad = new Grad();
         }
 
-//        Node n = (Node) actionEvent.getSource();
-//        Stage stage = (Stage) n.getScene().getWindow();
-//        //   stage.getOnHiding();
-//        stage.close();
+        editujGrad.setNaziv(fieldNaziv.getText());
+        editujGrad.setBrojStanovnika(Integer.parseInt(fieldBrojStanovnika.getText()));
+        editujGrad.setDrzava(choiceDrzava.getValue());
+
+        Node n = (Node) actionEvent.getSource();
+        Stage stage = (Stage) n.getScene().getWindow();
+        stage.close();
     }
 
     public Grad getGrad() {
-        return trenutniGrad;
+        return editujGrad;
     }
 
 }

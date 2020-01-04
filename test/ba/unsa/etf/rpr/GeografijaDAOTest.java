@@ -119,3 +119,5 @@ class GeografijaDAOTest {
         assertEquals("Vienna", gradovi.get(2).getNaziv());
     }
 }
+
+

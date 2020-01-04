@@ -5,17 +5,17 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class Grad  {
-    private SimpleIntegerProperty id = new SimpleIntegerProperty();
-    private SimpleStringProperty naziv = new SimpleStringProperty();
-    private SimpleIntegerProperty brojStanovnika = new SimpleIntegerProperty();
-    private SimpleObjectProperty drzava = new SimpleObjectProperty();
+    private SimpleIntegerProperty id;
+    private SimpleStringProperty naziv;
+    private SimpleIntegerProperty brojStanovnika;
+    private SimpleObjectProperty<Drzava> drzava;
 
 
     public Grad () {
         id = new SimpleIntegerProperty();
         naziv = new SimpleStringProperty();
         brojStanovnika = new SimpleIntegerProperty();
-        drzava = new SimpleObjectProperty();
+        drzava = new SimpleObjectProperty<>();
     }
     public Grad(int id, String naziv, int brojStanovnika, Drzava drzava) {
         this.id = new SimpleIntegerProperty(id);
@@ -61,19 +61,19 @@ public class Grad  {
     }
 
     public Drzava getDrzava() {
-        return (Drzava) drzava.get();
+        return drzava.get();
     }
 
-    public SimpleObjectProperty drzavaProperty() {
+    public SimpleObjectProperty<Drzava> drzavaProperty() {
         return drzava;
     }
 
-    public void setDrzava(Object drzava) {
+    public void setDrzava(Drzava drzava) {
         this.drzava.set(drzava);
     }
 
     @Override
     public String toString() {
-        return getNaziv();
+        return naziv.get();
     }
 }

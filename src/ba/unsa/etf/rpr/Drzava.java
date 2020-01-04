@@ -6,19 +6,19 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class Drzava {
    private SimpleIntegerProperty id;
-    private  SimpleStringProperty naziv ;
-    private  SimpleObjectProperty glavniGrad;
+    private  SimpleStringProperty naziv;
+    private  SimpleObjectProperty<Grad> glavniGrad;
 
     public Drzava(int id, String naziv, Grad glavniGrad) {
         this.id = new SimpleIntegerProperty(id);
         this.naziv = new SimpleStringProperty(naziv);
-        this.glavniGrad = new SimpleObjectProperty(glavniGrad);
+        this.glavniGrad = new SimpleObjectProperty<>(glavniGrad);
     }
 
     public Drzava() {
         id = new SimpleIntegerProperty();
         naziv = new SimpleStringProperty();
-        glavniGrad = new SimpleObjectProperty();
+        glavniGrad = new SimpleObjectProperty<>();
     }
 
     public int getId() {
@@ -46,19 +46,19 @@ public class Drzava {
     }
 
     public Grad getGlavniGrad() {
-        return (Grad) glavniGrad.get();
+        return glavniGrad.get();
     }
 
-    public SimpleObjectProperty glavniGradProperty() {
+    public SimpleObjectProperty<Grad> glavniGradProperty() {
         return glavniGrad;
     }
 
-    public void setGlavniGrad(Object glavniGrad) {
+    public void setGlavniGrad(Grad glavniGrad) {
         this.glavniGrad.set(glavniGrad);
     }
 
     @Override
     public String toString() {
-        return getNaziv();
+        return naziv.get();
     }
 }

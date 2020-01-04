@@ -95,7 +95,7 @@ class GradControllerTest {
         robot.clickOn("#btnOk");
 
         // Sada je i broj stanovnika validan, forma se zatvorila
-//        assertFalse(theStage.isShowing());
+       assertFalse(theStage.isShowing());
     }
 
     @Test
