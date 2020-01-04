@@ -6,6 +6,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
 
 public class Main extends Application {
@@ -27,17 +29,17 @@ public class Main extends Application {
 //
 //    }
 //
-//    public static String ispisiGradove() {
-//        ArrayList<Grad> gradovi = new ArrayList<>();
-//        String ispis = "";
-//        GeografijaDAO dao = GeografijaDAO.getInstance();
-//        gradovi = dao.gradovi();
-//        for (int i = 0; i < gradovi.size(); i = i + 1) {
-//            ispis = ispis + gradovi.get(i).getNaziv() + " (" + gradovi.get(i).getDrzava() + ") - " + gradovi.get(i).getBrojStanovnika() + "\n";
-//        }
-//        //   dao.removeInstance();
-//        return ispis;
-//    }
+    public static String ispisiGradove() {
+        ArrayList<Grad> gradovi;
+        String ispis = "";
+        GeografijaDAO dao = GeografijaDAO.getInstance();
+        gradovi = dao.gradovi();
+        for (int i = 0; i < gradovi.size(); i = i + 1) {
+            ispis = ispis + gradovi.get(i).getNaziv() + " (" + gradovi.get(i).getDrzava() + ") - " + gradovi.get(i).getBrojStanovnika() + "\n";
+        }
+        //   dao.removeInstance();
+        return ispis;
+    }
     @Override
     public void start(Stage primaryStage) throws Exception {
         GeografijaDAO dao = GeografijaDAO.getInstance();

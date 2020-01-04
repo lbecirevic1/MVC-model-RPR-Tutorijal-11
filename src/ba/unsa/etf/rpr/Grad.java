@@ -11,6 +11,12 @@ public class Grad  {
     private SimpleObjectProperty drzava = new SimpleObjectProperty();
 
 
+    public Grad () {
+        id = new SimpleIntegerProperty();
+        naziv = new SimpleStringProperty();
+        brojStanovnika = new SimpleIntegerProperty();
+        drzava = new SimpleObjectProperty();
+    }
     public Grad(int id, String naziv, int brojStanovnika, Drzava drzava) {
         this.id = new SimpleIntegerProperty(id);
         this.naziv = new SimpleStringProperty(naziv);

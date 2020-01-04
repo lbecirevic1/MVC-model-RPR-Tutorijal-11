@@ -1,5 +1,9 @@
 package ba.unsa.etf.rpr;
 
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.sql.*;
@@ -9,18 +13,20 @@ import java.util.Scanner;
 //Ovo je sada model klasa
 public class GeografijaDAO {
 
-//    private ObservableList<Drzava> drzave = FXCollections.observableArrayList();
-//    private SimpleObjectProperty<Drzava> trenutnaDrzava = new SimpleObjectProperty<>();
     private static GeografijaDAO instance;
-
+    private int slobodanIdGrada, slobodanIdDrzave;
     private static Connection conn = null;
     private static PreparedStatement dajGradoveStatement, dodajGrad, dodajDrzavu;
     private static PreparedStatement dajDrzavuStatement, dajGlavniGradStatement, dajGradStatement;
     private static PreparedStatement obrisiDrzavuStatement, dajIdDrzaveStatement, obrisiGradStatement, dajDrzavuPoNazivu, updateGrad;
-    private static PreparedStatement uzmiMaxIdDrzave, uzmiMaxIdGrada;
+    private static PreparedStatement uzmiMaxIdDrzave, uzmiMaxIdGrada, dajDrzave, dajGrad, obrisiGrad;
 
+    private ObservableList<Grad> listaGradova = FXCollections.observableArrayList();
+    private Grad trenutniGrad;
+    private ObservableList<Drzava> listaDrzava = FXCollections.observableArrayList();
+    private Drzava trenutnaDrzava;
 
-    private GeografijaDAO (){
+    private GeografijaDAO ()  {
         //konstruktor kreira konekcije i sve pripremljene upite
         try {
             conn = DriverManager.getConnection("jdbc:sqlite:baza.db");
@@ -34,6 +40,10 @@ public class GeografijaDAO {
                 ex.printStackTrace();
             }
         }
+        listaGradova.addAll(gradovi());
+        listaDrzava.addAll(drzave());
+        trenutniGrad = gradovi().get(0);
+        trenutnaDrzava = drzave().get(0);
     }
 
     private static void initialize () {
@@ -152,7 +162,14 @@ public class GeografijaDAO {
             e.printStackTrace();
         }
     }
-
+    public void obrisiGrad (Grad grad) {
+        try {
+            obrisiGrad.setInt(1,grad.getId());
+            obrisiGrad.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     public Drzava nadjiDrzavu(String naziv) {
         try {
             dajDrzavuPoNazivu.setString(1, naziv);
@@ -175,40 +192,42 @@ public class GeografijaDAO {
     }
 
     public void dodajGrad(Grad grad) {
-        int id = 0;
-        try {
-            ResultSet result1 = uzmiMaxIdGrada.executeQuery();
-            if (result1.next()) {
-                id = result1.getInt(1);
+            try {
+                ResultSet result = uzmiMaxIdGrada.executeQuery();
+                result.next();
+                slobodanIdGrada = result.getInt(1);
+                slobodanIdGrada++;
+                dodajGrad.setInt(1, slobodanIdGrada);
+                dodajGrad.setString(2, grad.getNaziv());
+                dodajGrad.setInt(3, grad.getBrojStanovnika());
+                dodajGrad.setInt(4, grad.getDrzava().getId());
+                dodajGrad.executeUpdate();
+                grad.setId(slobodanIdGrada);
+                slobodanIdGrada++;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            grad.setId(id);
-            dodajGrad.setInt(1, id);
-            dodajGrad.setString(2, grad.getNaziv());
-            dodajGrad.setInt(3,grad.getBrojStanovnika());
-            dodajGrad.setInt(4, grad.getDrzava().getId());
-            dodajGrad.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
+        listaGradova.clear();
+        listaGradova.addAll(gradovi());
     }
 
     public void dodajDrzavu(Drzava drzava) {
-        int id = 0;
         try {
-            ResultSet result1 = uzmiMaxIdDrzave.executeQuery();
-            if (result1.next()) {
-                id = result1.getInt(1);
-            }
-            drzava.setId(id);
-            dodajDrzavu.setInt(1, id);
+            ResultSet result2 = uzmiMaxIdDrzave.executeQuery();
+            result2.next();
+            slobodanIdDrzave = result2.getInt(1);
+            slobodanIdDrzave++;
+            dodajDrzavu.setInt(1, slobodanIdDrzave);
             dodajDrzavu.setString(2,drzava.getNaziv());
             dodajDrzavu.setInt(3, drzava.getGlavniGrad().getId());
             dodajDrzavu.executeUpdate();
+            drzava.setId(slobodanIdDrzave);
+            slobodanIdDrzave++;
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        listaDrzava.clear();
+        listaDrzava.addAll(drzave());
     }
 
     public void izmijeniGrad(Grad grad) {
@@ -221,6 +240,8 @@ public class GeografijaDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        listaGradova.clear();
+        listaGradova.addAll(gradovi());
     }
 
 
@@ -236,14 +257,70 @@ public class GeografijaDAO {
         obrisiGradStatement = conn.prepareStatement("DELETE from grad where drzava=?");
         updateGrad = conn.prepareStatement("UPDATE grad SET naziv=?,broj_stanovnika=?,drzava=? WHERE id=?");
         dajDrzavuPoNazivu = conn.prepareStatement("SELECT * FROM drzava where naziv=?");
-        uzmiMaxIdGrada = conn.prepareStatement("SELECT max(id)+1 FROM grad");
-        uzmiMaxIdDrzave = conn.prepareStatement("SELECT max(id)+1 FROM drzava");
+        uzmiMaxIdGrada = conn.prepareStatement("SELECT max(id) FROM grad");
+        uzmiMaxIdDrzave = conn.prepareStatement("SELECT max(id) FROM drzava");
+        dajDrzave = conn.prepareStatement("SELECT * FROM drzava");
+        dajGrad = conn.prepareStatement("SELECT * FROM grad where id=?");
+        obrisiGrad = conn.prepareStatement("DELETE FROM grad WHERE id=?");
 
     }
 
+    public ArrayList<Drzava> drzave ()  {
+        ArrayList<Drzava> listaDrzava = new ArrayList<>();
+        ResultSet result1 = null;
+        try {
+            result1 = dajDrzave.executeQuery();
+            while (result1.next()) {
+                Drzava drzava = new Drzava(result1.getInt("id"), result1.getString("naziv"), null);
+                dajGrad.setInt(1, result1.getInt("id"));
+                ResultSet result2 = dajGrad.executeQuery();
+                if (result2.next()) {
+                    Grad grad = new Grad(result2.getInt("id"), result2.getString("naziv"), result2.getInt("broj_stanovnika"), drzava);
+                    drzava.setGlavniGrad(grad);
+                    listaDrzava.add(drzava);
+                } else {
+                    listaDrzava.add(drzava);
+                }
+                result2.close();
+            }
+            result1.close();
+        }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+        return listaDrzava;
+    }
 
-    public Object drzave() {
-        return null;
+    public ObservableList<Grad> getListaGradova() {
+        return listaGradova;
+    }
+
+    public void setListaGradova(ObservableList<Grad> listaGradova) {
+        this.listaGradova = listaGradova;
+    }
+
+    public Grad getTrenutniGrad() {
+        return trenutniGrad;
+    }
+
+    public void setTrenutniGrad(Grad trenutniGrad) {
+        this.trenutniGrad = trenutniGrad;
+    }
+
+    public ObservableList<Drzava> getListaDrzava() {
+        return listaDrzava;
+    }
+
+    public void setListaDrzava(ObservableList<Drzava> listaDrzava) {
+        this.listaDrzava = listaDrzava;
+    }
+
+    public Drzava getTrenutnaDrzava() {
+        return trenutnaDrzava;
+    }
+
+    public void setTrenutnaDrzava(Drzava trenutnaDrzava) {
+        this.trenutnaDrzava = trenutnaDrzava;
     }
 
     public Grad nadjiGrad(String graz) {

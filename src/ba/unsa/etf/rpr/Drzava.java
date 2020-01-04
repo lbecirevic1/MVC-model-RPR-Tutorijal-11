@@ -15,6 +15,12 @@ public class Drzava {
         this.glavniGrad = new SimpleObjectProperty(glavniGrad);
     }
 
+    public Drzava() {
+        id = new SimpleIntegerProperty();
+        naziv = new SimpleStringProperty();
+        glavniGrad = new SimpleObjectProperty();
+    }
+
     public int getId() {
         return id.get();
     }
