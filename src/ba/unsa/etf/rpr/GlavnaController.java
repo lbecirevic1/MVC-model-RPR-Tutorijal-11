@@ -35,6 +35,8 @@ public class GlavnaController {
     public TableColumn<Grad, String> colGradNaziv;
     public TableColumn<Grad, Integer> colGradStanovnika;
     public TableColumn<Grad, String> colGradDrzava;
+    public TableColumn<Grad, String> colGradSlika;
+    public TableColumn<Grad, Integer> colGradPostanskiBroj;
     public Button btnDodajGrad;
     public Button btnDodajDrzavu;
     public Button btnIzmijeniGrad;
@@ -53,13 +55,15 @@ public class GlavnaController {
 
     @FXML
     public void initialize () {
-     //   ObservableList<Grad> listaGradova = FXCollections.observableArrayList(dao.gradovi());
-        tableViewGradovi.setItems(listaZaTabelu);
+        ObservableList<Grad> listaGradova = FXCollections.observableArrayList(dao.gradovi());
+        tableViewGradovi.setItems(listaGradova);
         colGradId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colGradNaziv.setCellValueFactory(new PropertyValueFactory<>("naziv"));
         colGradStanovnika.setCellValueFactory(new PropertyValueFactory<>("brojStanovnika"));
         colGradDrzava.setCellValueFactory(new PropertyValueFactory<>("drzava"));
-        tableViewGradovi.getColumns().setAll(colGradId, colGradNaziv, colGradStanovnika, colGradDrzava);
+        colGradSlika.setCellValueFactory(new PropertyValueFactory<>("slika"));
+        colGradPostanskiBroj.setCellValueFactory(new PropertyValueFactory<>("postanskiBroj"));
+        tableViewGradovi.getColumns().setAll(colGradId, colGradNaziv, colGradStanovnika, colGradDrzava, colGradSlika, colGradPostanskiBroj);
     }
 
     public void resetujBazu() {
@@ -130,7 +134,7 @@ public class GlavnaController {
         myStage.setOnHiding(event -> Platform.runLater(() -> {
             if (gradController.getGrad() != null)
                 dao.izmijeniGrad(gradController.getGrad());
-            listaZaTabelu.setAll(dao.getListaGradova());
+            listaZaTabelu.setAll(dao.gradovi());
         }));
     }
 

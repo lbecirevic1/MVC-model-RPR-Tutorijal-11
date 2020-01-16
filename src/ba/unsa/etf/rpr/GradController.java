@@ -7,14 +7,16 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -22,8 +24,10 @@ public class GradController {
     public TextField fieldNaziv;
     public ChoiceBox<Drzava> choiceDrzava;
     public TextField fieldBrojStanovnika;
+    public TextField fieldPostanskiBroj;
     public Button btnOk;
     public Button btnCancel;
+    public ImageView gradSlika;
     private ArrayList<Drzava> listaDrzava;
     private Grad editujGrad;
   //  private Grad trenutniGrad = null;
@@ -51,6 +55,12 @@ public class GradController {
             for (Drzava drzava : listaDrzava)
                 if (drzava.getId() == editujGrad.getDrzava().getId())
                     choiceDrzava.getSelectionModel().select(drzava);
+            fieldPostanskiBroj.setText(String.valueOf(editujGrad.getPostanskiBroj()));
+            URI uri = null;
+            File f = new File(editujGrad.getSlika());
+            uri = f.toURI();
+            gradSlika.setImage(new Image(uri.toString()));
+
         } else {
             choiceDrzava.getSelectionModel().selectFirst();
         }
@@ -95,6 +105,7 @@ public class GradController {
 
         editujGrad.setNaziv(fieldNaziv.getText());
         editujGrad.setBrojStanovnika(Integer.parseInt(fieldBrojStanovnika.getText()));
+        editujGrad.setPostanskiBroj(Integer.parseInt(fieldPostanskiBroj.getText()));
         editujGrad.setDrzava(choiceDrzava.getValue());
 
         Node n = (Node) actionEvent.getSource();
@@ -106,4 +117,25 @@ public class GradController {
         return editujGrad;
     }
 
+    public void promijeniSliku(ActionEvent actionEvent) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Text Input Dialog");
+      //  dialog.setHeaderText("Look, a Text Input Dialog");
+        dialog.setContentText("Unesite adresu slike: ");
+
+// Traditional way to get the response value.
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            //Promijeni sliku
+            String adresa = result.get();
+
+            File f = new File(adresa);
+            URI uri = f.toURI();
+            gradSlika.setImage(new Image(uri.toString()));
+
+        }
+
+// The Java 8 way to get the response value (with lambda expression).
+// result.ifPresent(name -> System.out.println("Your name: " + name));
+    }
 }

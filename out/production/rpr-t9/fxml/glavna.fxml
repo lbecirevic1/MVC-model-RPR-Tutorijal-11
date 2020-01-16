@@ -8,13 +8,15 @@
     <children>
         <TableView fx:id="tableViewGradovi" prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="colGradId" maxWidth="1.7976931348623157E308" prefWidth="75.0" text="ID" />
-                <TableColumn fx:id="colGradNaziv" maxWidth="1.7976931348623157E308" prefWidth="86.4000244140625" text="Naziv" />
-                <TableColumn fx:id="colGradStanovnika" maxWidth="1.7976931348623157E308" prefWidth="112.79997253417969" text="Stanovnika" />
-                <TableColumn fx:id="colGradDrzava" maxWidth="1.7976931348623157E308" prefWidth="179.4000244140625" text="Država" />
+                <TableColumn fx:id="colGradId" maxWidth="1.7976931348623157E308" prefWidth="35.20001143217087" text="ID" />
+                <TableColumn fx:id="colGradNaziv" maxWidth="1.7976931348623157E308" prefWidth="85.19998550415039" text="Naziv" />
+                <TableColumn fx:id="colGradStanovnika" maxWidth="1.7976931348623157E308" prefWidth="106.19998168945312" text="Stanovnika" />
+                <TableColumn fx:id="colGradDrzava" maxWidth="1.7976931348623157E308" prefWidth="76.99998474121094" text="Država" />
+            <TableColumn fx:id="colGradSlika" prefWidth="53.4000244140625" text="Slika" />
+            <TableColumn fx:id="colGradPostanskiBroj" prefWidth="112.20001220703125" text="Postanski broj" />
             </columns>
         </TableView>
-        <VBox maxWidth="120.0" prefHeight="400.0" prefWidth="200.0" spacing="5.0" HBox.hgrow="NEVER">
+        <VBox maxWidth="120.0" prefHeight="400.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="NEVER">
             <children>
                 <Button fx:id="btnDodajGrad" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#dodajGrad" prefHeight="26.0" prefWidth="126.0" text="Dodaj grad">
                     <VBox.margin>
